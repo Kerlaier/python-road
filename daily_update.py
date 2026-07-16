@@ -51,10 +51,10 @@ def main():
 
     # 推送到 GitHub
     repo = os.path.expanduser(r"~\Desktop\python-road")
-    subprocess.run(["git", "-C", repo, "add", "-A"], check=False)
-    subprocess.run(["git", "-C", repo, "commit", "-m", f"自动更新: 学习录 {os.path.basename(SOURCE)}"],
+    subprocess.run(["git", "-C", repo, "-c", "http.proxy=http://127.0.0.1:7890", "-c", "https.proxy=http://127.0.0.1:7890", "add", "-A"], check=False)
+    subprocess.run(["git", "-C", repo, "-c", "http.proxy=http://127.0.0.1:7890", "-c", "https.proxy=http://127.0.0.1:7890", "commit", "-m", f"自动更新: 学习录 {os.path.basename(SOURCE)}"],
                    check=False)
-    subprocess.run(["git", "-C", repo, "push", "origin", "main"], check=False)
+    subprocess.run(["git", "-C", repo, "-c", "http.proxy=http://127.0.0.1:7890", "-c", "https.proxy=http://127.0.0.1:7890", "push", "origin", "main"], check=False)
     print("[已推送到 GitHub]")
 
     # 记录本次更新时间
@@ -64,3 +64,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
