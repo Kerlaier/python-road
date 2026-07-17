@@ -1,44 +1,38 @@
 # -*- coding: utf-8 -*-
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
-"""
-============================================================
-  第3课练习 —— 做个"BMI 计算器"
-  BMI = 体重(kg) / 身高(m)的平方
-============================================================
-"""
 
 print("=" * 40)
 print("  BMI 计算器")
 print("=" * 40)
 
 # ========== 练习1：获取用户输入 ==========
-# 提示：input() 返回的是字符串，用 float() 转成小数
-# 把下面两行的注释去掉，补全代码：
 
-# height = input("请输入你的身高（米）：")
-# weight = input("请输入你的体重（公斤）：")
-
-# 在这里把你的 input 转成数字：
-
+height = float(input("请输入你的身高（米）："))
+weight = float(input("请输入你的体重（公斤）："))
 
 
 # ========== 练习2：计算 BMI ==========
-# 公式：bmi = 体重 / (身高 * 身高)
 
+bmi = weight / (height * height)
 
 
 # ========== 练习3：输出结果 ==========
-# 用 print 和 f-string 输出类似：你的 BMI 是: 22.86
 
+print(f"你的 BMI 是: {bmi:.2f}")
 
 
 # ========== 练习4（选做）：AA制分账 ==========
-# 三个人吃饭花了298元，每人付多少？剩几块零头？
-# 提示：用 // 和 %
 
+total = 298
+people = 3
+per_person = total // people
+left = total % people
+print(f"每人付{per_person}元，还剩{left}元")
 
 
 # ========== 练习5（选做）：判断是否超预算 ==========
-# 你的预算是50元，实际花了67.5元
-# 用一个比较运算符判断是否超预算，输出 True 或 False
+
+budget = 50
+spent = 67.5
+print(spent > budget)

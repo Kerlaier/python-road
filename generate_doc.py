@@ -146,10 +146,69 @@ def add_checklist(doc, items):
         p = doc.add_paragraph(f"  ☐ {item}")
         p.paragraph_format.space_before = Pt(1); p.paragraph_format.space_after = Pt(1)
 
-# ============================================================
-# 第2课：数据类型
-# ============================================================
 
+def parse_practice_answers(lesson_number):
+    """从 practice.py 解析作业答案，支持两种格式"""
+    fname = f"lesson_{lesson_number:02d}_practice.py"
+    filepath = os.path.join(SOURCE, fname)
+    if not os.path.exists(filepath):
+        print(f"  [警告] practice 文件不存在: {fname}")
+        return []
+    with open(filepath, "r", encoding="utf-8") as f:
+        plines = f.readlines()
+    num_map = {1: "一", 2: "二", 3: "三", 4: "四", 5: "五"}
+    is_block = any(re.match(r"# ={20,}", l.strip()) for l in plines)
+    exercises = []
+    i = 0
+    while i < len(plines):
+        s = plines[i].strip()
+        if is_block:
+            m = re.match(r"# 练习(\d+)", s)
+        else:
+            m = re.match(r"# ={5,} 练习(\d+)", s)
+        if m:
+            num = int(m.group(1))
+            if is_block:
+                title_m = re.search(r"练习\d+[：:]\s*(.+)", s)
+                question = title_m.group(1) if title_m else f"练习{num}"
+                # 跳过到闭合分隔符 # ===== 之后
+                j = i + 1
+                while j < len(plines):
+                    if re.match(r"# ={20,}", plines[j].strip()):
+                        j += 1
+                        break
+                    if plines[j].strip().startswith("# 提示") or plines[j].strip().startswith("#提示"):
+                        pass
+                    j += 1
+            else:
+                title_m = re.search(r"练习\d+[：:]\s*(.+?)\s*=*$", s)
+                question = title_m.group(1) if title_m else f"练习{num}"
+                j = i + 1
+            hint = ""
+            code_lines = []
+            while j < len(plines):
+                sj = plines[j].strip()
+                if is_block:
+                    if re.match(r"# ={20,}", sj) or re.match(r"# 练习\d+", sj):
+                        break
+                else:
+                    if re.match(r"# ={5,} 练习\d+", sj):
+                        break
+                if sj.startswith("# 提示") or sj.startswith("#提示"):
+                    hint = sj.lstrip("# ").strip()
+                    j += 1
+                elif sj.startswith("#") or sj == "":
+                    j += 1
+                else:
+                    code_lines.append(plines[j].rstrip())
+                    j += 1
+            code = "\n".join(code_lines)
+            if code.strip():
+                exercises.append((num_map.get(num, str(num)), question, code, hint))
+        i += 1
+    if not exercises:
+        print(f"  [警告] practice 文件中未找到答案代码: {fname}")
+    return exercises
 def add_watermark(doc, text="by Kerlaier"):
     """添加隐秘水印 -- 浅灰色斜体页脚文字"""
     section = doc.sections[0]
@@ -276,30 +335,11 @@ def generate_lesson_2():
     # ======== 作业部分 ========
     add_section_title(doc, "✏️ 课后练习")
 
-    add_homework_item(doc, "一",
-        "计算圆的面积",
-        "pi = 3.14\nr = 5\narea = pi * r ** 2\nprint(f\"半径为{r}的圆的面积是{area}\")",
-        "提示：面积 = 3.14 * r ** 2，假设半径 r = 5")
+    answers = parse_practice_answers(2)
+    for num, question, code, hint in answers:
+        add_homework_item(doc, num, question, code, hint)
 
-    add_homework_item(doc, "二",
-        "把字符串 \"apple,banana,grape\" 按逗号分割成列表",
-        'fruits = "apple,banana,grape"\nfruit_list = fruits.split(",")\nprint(fruit_list)',
-        "提示：使用 .split(\",\") 方法")
 
-    add_homework_item(doc, "三",
-        "检查 100 是奇数还是偶数",
-        "num = 100\nif num % 2 == 0:\n    print(\"100是偶数\")\nelse:\n    print(\"100是奇数\")",
-        "提示：用 % 取余运算，能被2整除就是偶数")
-
-    add_homework_item(doc, "四",
-        "把你的名字 \"Kerlaier\" 反转输出",
-        'name = "Kerlaier"\nreverse_name = name[::-1]\nprint(f"反转后是：{reverse_name}")',
-        "提示：用切片 [::-1] 可以反转字符串")
-
-    add_homework_item(doc, "五",
-        "判断 2024 是否是闰年",
-        "year = 2024\nif (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):\n    print(\"是闰年\")\nelse:\n    print(\"不是闰年\")",
-        "提示：能被4整除但不能被100整除，或者能被400整除")
 
     add_checklist(doc, [
         "能区分 int 和 float，会用基本算术运算符",
@@ -420,26 +460,11 @@ def generate_lesson_3():
         "完整点餐计算器")
 
     add_section_title(doc, "✏️ 课后练习")
-    add_homework_item(doc, "一",
-        "获取用户输入的身高和体重",
-        '# height = input("请输入你的身高（米）：")\n# weight = input("请输入你的体重（公斤）：")\n# height = float(height)  # 转成小数\n# weight = float(weight)',
-        "提示：input() 返回字符串，用 float() 转成小数")
-    add_homework_item(doc, "二",
-        "计算 BMI = 体重 / (身高 × 身高)",
-        '# bmi = weight / (height * height)',
-        "公式：BMI = 体重(kg) / 身高(m)的平方")
-    add_homework_item(doc, "三",
-        "输出 BMI 结果",
-        '# print(f"你的 BMI 是: {bmi:.2f}")',
-        "用 f-string 保留两位小数")
-    add_homework_item(doc, "四",
-        "AA制分账：三人吃饭花98元，每人多少？剩几块？",
-        '# total = 98; people = 3\n# per = total // people\n# left = total % people',
-        "提示：用 // 整除和 % 取余")
-    add_homework_item(doc, "五",
-        "判断是否超预算：预算50元，实际花了67.5元",
-        '# budget = 50; spent = 67.5\n# print(spent > budget)  # True',
-        "提示：用比较运算符 > 判断")
+    answers = parse_practice_answers(3)
+    for num, question, code, hint in answers:
+        add_homework_item(doc, num, question, code, hint)
+
+
 
     add_checklist(doc, [
         "会用 print() 输出，理解 sep 和 end 参数",
@@ -541,25 +566,11 @@ def generate_lesson_4():
         "or 实战：满足一个就行")
 
     add_section_title(doc, "✏️ 课后练习")
-    add_homework_item(doc, "一",
-        "判断奇偶：输入一个数字，判断是奇数还是偶数",
-        'a = int(input("请输入一个数字："))\nif a % 2 == 0:\n    print("偶数")\nelse:\n    print("奇数")',
-        "提示：num % 2 == 0 就是偶数")
+    answers = parse_practice_answers(4)
+    for num, question, code, hint in answers:
+        add_homework_item(doc, num, question, code, hint)
 
-    add_homework_item(doc, "二",
-        "年龄分类：输入年龄，输出所属阶段（儿童/青少年/成年人/老年人）",
-        'age = int(input("年龄："))\nif age < 12:\n    print("儿童")\nelif age < 18:\n    print("青少年")\nelif age < 60:\n    print("成年人")\nelse:\n    print("老年人")',
-        "提示：<12 儿童, 12-17 青少年, 18-59 成年人, >=60 老年人")
 
-    add_homework_item(doc, "三",
-        "出租车计价器：3公里内起步价10元，超出每公里加2元",
-        'a = int(input("公里数："))\nif a <= 3:\n    print("10元")\nelse:\n    b = 10 + (a-3) * 2\n    print(f"{b}元")',
-        "提示：用 if 判断是否超过3公里")
-
-    add_homework_item(doc, "四",
-        "简易登录验证：用户名=\"python\"，密码=123，分别判断用户名和密码是否正确",
-        'name = "python"\nkey = 123\na = input("用户名：")\nb = int(input("密码："))\nif a == name and b == key:\n    print("登录成功")\nelif a != name and b == key:\n    print("用户名不存在")\nelse:\n    print("密码错误")',
-        "提示：先判断都正确，再分情况判断")
 
     add_checklist(doc, [
         "理解 if / elif / else 的执行逻辑",
@@ -686,22 +697,11 @@ def generate_lesson_5():
         "密码重试（while + break + 计数器）")
 
     add_section_title(doc, "✏️ 课后练习")
-    add_homework_item(doc, "一",
-        "用 for 循环和 range() 打出 1 到 100 中所有能被 7 整除的数字",
-        "# 提示：for i in range(1, 101): 配合 if i % 7 == 0",
-        "提示：range(1, 101)，配合 if 判断 i % 7 == 0")
-    add_homework_item(doc, "二",
-        "用 for 循环计算 1+2+3+...+100 的总和",
-        "# 提示：sum = 0\n# for i in range(1, 101): sum += i",
-        "提示：先设 sum=0，每次循环 sum = sum + 当前数")
-    add_homework_item(doc, "三",
-        "猜数字游戏：预设 target=66，让用户猜，每次提示\"大了\"\"小了\"，猜对后打印次数",
-        "# 提示：while True 配合 input() 和 if/elif/else 和 break",
-        "提示：用 while True + input() + if/elif + break")
-    add_homework_item(doc, "四",
-        "打印九九乘法表：两层 for 循环嵌套",
-        "# 提示：for i in range(1, 10):\n#     for j in range(1, i+1):\n#         print(f\"{j}x{i}={i*j}\", end=\" \")\n#     print()",
-        "提示：外层 i 控制行，内层 j 控制每行几个")
+    answers = parse_practice_answers(5)
+    for num, question, code, hint in answers:
+        add_homework_item(doc, num, question, code, hint)
+
+
 
     add_checklist(doc, [
         "理解 for 循环：遍历集合或 range() 固定次数",

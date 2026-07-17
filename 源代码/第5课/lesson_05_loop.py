@@ -103,16 +103,16 @@ print(f"（调试：正确答案是{target}）")
 simulated_guesses = [50, 80, 65, 72, target]
 
 for guess in simulated_guesses:
-    attempts = attempts + 1
+    attempts = attempts + 1           # 计数器+1，记录猜了几次
     print(f"第{attempts}次猜：{guess}")
 
-    if guess > target:
+    if guess > target:                # if：如果猜大了
         print("  太大了！")
-    elif guess < target:
+    elif guess < target:              # elif：否则如果猜小了
         print("  太小了！")
-    else:
+    else:                             # else：不大不小就是对了
         print(f"  猜对了！正确答案就是{target}，你用了{attempts}次")
-        break
+        break                         # break：猜对就跳出循环
 
 # ============================================================
 # 六、实战：密码重试（最多3次）
@@ -127,12 +127,12 @@ tried = 0
 simulated_inputs = ["111111", "222222", "123456"]
 
 for pw in simulated_inputs:
-    tried = tried + 1
+    tried = tried + 1                # 记录已尝试次数
 
-    if pw == correct_password:
+    if pw == correct_password:       # 密码正确
         print(f"登录成功！（第{tried}次尝试）")
-        break
-    else:
+        break                        # 登录成功，跳出循环
+    else:                            # 密码错误
         remaining = max_try - tried
         if remaining > 0:
             print(f"密码错误，还剩{remaining}次机会")
