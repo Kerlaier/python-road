@@ -3,8 +3,6 @@
 import os, subprocess, sys, glob, shutil
 
 SOURCE = os.path.expanduser(r"~\Desktop\python学习文件")
-OUTPUT_DESKTOP = os.path.expanduser(r"~\Desktop\学习录")
-OUTPUT_REPO = os.path.expanduser(r"~\Desktop\python-road\学习录")
 STATE_FILE = os.path.expanduser(r"~\Desktop\python-road\.last_update")
 REPO = os.path.expanduser(r"~\Desktop\python-road")
 SCRIPT = os.path.join(REPO, "generate_doc.py")
@@ -42,11 +40,7 @@ def main():
     if result.stderr:
         print(result.stderr)
 
-    # 复制 docx 到仓库
-    os.makedirs(OUTPUT_REPO, exist_ok=True)
-    for f in glob.glob(os.path.join(OUTPUT_DESKTOP, "*.docx")):
-        dst = os.path.join(OUTPUT_REPO, os.path.basename(f))
-        shutil.copy2(f, dst)
+    # generate_doc.py 已直接输出到仓库学习录目录，无需额外复制
 
     # 复制 thinking.py 到仓库根目录
     thinking_src = os.path.join(SOURCE, "thinking.py")

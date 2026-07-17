@@ -12,7 +12,7 @@ import os, re, shutil
 SOURCE = os.path.expanduser(r"~\Desktop\python学习文件")
 REPO = os.path.expanduser(r"~\Desktop\python-road")
 SOURCE_DIR = os.path.join(REPO, "源代码")
-OUTPUT = os.path.expanduser(r"~\Desktop\学习录")
+OUTPUT = os.path.join(REPO, "学习录")
 
 THEME_BLUE  = RGBColor(0x2B, 0x5C, 0x8A)
 THEME_GOLD  = RGBColor(0xE8, 0x9C, 0x25)
