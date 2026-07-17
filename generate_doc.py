@@ -7,9 +7,11 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn, nsdecls
 from docx.oxml import parse_xml
-import os, re
+import os, re, shutil
 
 SOURCE = os.path.expanduser(r"~\Desktop\python学习文件")
+REPO = os.path.expanduser(r"~\Desktop\python-road")
+SOURCE_DIR = os.path.join(REPO, "源代码")
 OUTPUT = os.path.expanduser(r"~\Desktop\学习录")
 
 THEME_BLUE  = RGBColor(0x2B, 0x5C, 0x8A)
@@ -147,6 +149,42 @@ def add_checklist(doc, items):
 # ============================================================
 # 第2课：数据类型
 # ============================================================
+
+def add_watermark(doc, text="by Kerlaier"):
+    """添加隐秘水印 -- 浅灰色斜体页脚文字"""
+    section = doc.sections[0]
+    footer = section.footer
+    footer.is_linked_to_previous = False
+    p = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    run = p.add_run(text)
+    run.font.size = Pt(8)
+    run.font.color.rgb = RGBColor(0xD0, 0xD0, 0xD0)
+    run.font.italic = True
+    run.font.name = "Microsoft YaHei"
+
+
+def copy_source_files(lesson_number):
+    """复制对应课程的 .py 源文件到仓库源代码目录"""
+    lesson_map = {
+        2: ["lesson_02_datatypes.py", "lesson_02_practice.py"],
+        3: ["lesson_03_io.py", "lesson_03_practice.py"],
+        4: ["lesson_04_if.py", "lesson_04_practice.py"],
+        5: ["lesson_05_loop.py", "lesson_05_practice.py"],
+    }
+    files = lesson_map.get(lesson_number, [])
+    dest_dir = os.path.join(SOURCE_DIR, f"第{lesson_number}课")
+    os.makedirs(dest_dir, exist_ok=True)
+    for fname in files:
+        src = os.path.join(SOURCE, fname)
+        dst = os.path.join(dest_dir, fname)
+        if os.path.exists(src):
+            shutil.copy2(src, dst)
+            print(f"  已复制源文件: {fname}")
+        else:
+            print(f"  [警告] 源文件不存在: {fname}")
+
+
 def generate_lesson_2():
     doc = Document()
     section = doc.sections[0]
@@ -272,14 +310,13 @@ def generate_lesson_2():
         "完成全部 5 道练习题 ✅"
     ])
 
+    add_watermark(doc)
     os.makedirs(OUTPUT, exist_ok=True)
     path = os.path.join(OUTPUT, "第2课_数据类型.docx")
     doc.save(path)
     print(f"OK: {path}")
+    copy_source_files(2)
     return path
-
-if __name__ == "__main__":
-    generate_lesson_2()
 
 # ============================================================
 # 第3课：输入输出 & 运算符
@@ -413,10 +450,12 @@ def generate_lesson_3():
         "独立完成餐厅账单计算器"
     ])
 
+    add_watermark(doc)
     os.makedirs(OUTPUT, exist_ok=True)
     path = os.path.join(OUTPUT, "第3课_输入输出.docx")
     doc.save(path)
     print(f"OK: {path}")
+    copy_source_files(3)
 
 # ============================================================
 # 第4课：条件判断 if/elif/else
@@ -531,10 +570,12 @@ def generate_lesson_4():
         "完成全部课后练习 ✅"
     ])
 
+    add_watermark(doc)
     os.makedirs(OUTPUT, exist_ok=True)
     path = os.path.join(OUTPUT, "第4课_条件判断.docx")
     doc.save(path)
     print(f"OK: {path}")
+    copy_source_files(4)
 
 # ============================================================
 # 第5课：循环 for / while
@@ -671,10 +712,12 @@ def generate_lesson_5():
         "完成全部课后练习"
     ])
 
+    add_watermark(doc)
     os.makedirs(OUTPUT, exist_ok=True)
     path = os.path.join(OUTPUT, "第5课_循环.docx")
     doc.save(path)
     print(f"OK: {path}")
+    copy_source_files(5)
 
 if __name__ == "__main__":
     generate_lesson_2()

@@ -1,12 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
 """每日自动更新脚本 —— 检测新内容并生成文档推送到 GitHub"""
-import os, subprocess, sys, glob
+import os, subprocess, sys, glob, shutil
 
 SOURCE = os.path.expanduser(r"~\Desktop\python学习文件")
 OUTPUT_DESKTOP = os.path.expanduser(r"~\Desktop\学习录")
 OUTPUT_REPO = os.path.expanduser(r"~\Desktop\python-road\学习录")
 STATE_FILE = os.path.expanduser(r"~\Desktop\python-road\.last_update")
-SCRIPT = os.path.expanduser(r"~\Desktop\python-road\generate_doc.py")
+REPO = os.path.expanduser(r"~\Desktop\python-road")
+SCRIPT = os.path.join(REPO, "generate_doc.py")
 
 def get_latest_py_time(folder):
     """获取文件夹中最新的 .py 文件修改时间"""
@@ -41,12 +42,18 @@ def main():
     if result.stderr:
         print(result.stderr)
 
-    # 复制到仓库目录
+    # 复制 docx 到仓库
     os.makedirs(OUTPUT_REPO, exist_ok=True)
     for f in glob.glob(os.path.join(OUTPUT_DESKTOP, "*.docx")):
         dst = os.path.join(OUTPUT_REPO, os.path.basename(f))
-        import shutil
         shutil.copy2(f, dst)
+
+    # 复制 thinking.py 到仓库根目录
+    thinking_src = os.path.join(SOURCE, "thinking.py")
+    if os.path.exists(thinking_src):
+        shutil.copy2(thinking_src, os.path.join(REPO, "thinking.py"))
+        print("  已复制 thinking.py")
+
     print("[已复制到仓库]")
 
     # 推送到 GitHub
