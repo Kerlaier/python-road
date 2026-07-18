@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Python 学习录 - 文档生成器"""
 
 from docx import Document
@@ -230,6 +230,7 @@ def copy_source_files(lesson_number):
         3: ["lesson_03_io.py", "lesson_03_practice.py"],
         4: ["lesson_04_if.py", "lesson_04_practice.py"],
         5: ["lesson_05_loop.py", "lesson_05_practice.py"],
+        6: ["lesson_06_list.py", "lesson_06_practice.py"],
     }
     files = lesson_map.get(lesson_number, [])
     dest_dir = os.path.join(SOURCE_DIR, f"第{lesson_number}课")
@@ -719,11 +720,131 @@ def generate_lesson_5():
     print(f"OK: {path}")
     copy_source_files(5)
 
+
+# ============================================================
+# 第6课：列表 list
+# ============================================================
+def generate_lesson_6():
+    doc = Document()
+    section = doc.sections[0]
+    section.page_width = Cm(21); section.page_height = Cm(29.7)
+
+    add_chapter_banner(doc, 6, "列表 list", "2026-07-17")
+
+    add_section_title(doc, "一、什么是列表？——能装多个东西的容器")
+    add_code_block(doc,
+        "# 语法：用 [] 创建，里面用逗号隔开\n"
+        'cart = ["苹果", "香蕉", "牛奶"]    # 字符串列表\n'
+        "scores = [95, 88, 73, 90]          # 数字列表\n"
+        'mixed = ["小明", 20, True, 95.5]   # 混合类型（可以不常用）\n\n'
+        'print(f"购物车: {cart}")\n'
+        'print(f"成绩单: {scores}")\n'
+        'print(f"有几样东西: {len(cart)}件")  # len() 查元素个数',
+        "场景1：购物车")
+
+    add_knowledge_card(doc,
+        "列表 = []  里面放多个值，用逗号隔开",
+        'fruits = ["苹果", "香蕉", "橘子"]\nscores = [95, 88, 73, 90]',
+        '["苹果", "香蕉", "橘子"]\n[95, 88, 73, 90]',
+        "列表就是一个能装多个东西的容器，用 [] 包起来")
+
+    add_section_title(doc, "二、索引和切片 —— 和字符串一模一样")
+    add_knowledge_card(doc,
+        "列表[索引]   索引从0开始，-1是最后一个\n列表[起点:终点]   切片不包含终点",
+        'scores = [95, 88, 73, 90]\nprint(scores[0])      # 第一个：95\nprint(scores[-1])     # 最后一个：90\nprint(scores[1:3])    # 索引1到2: [88, 73]\nprint(scores[:2])     # 前两个: [95, 88]',
+        '95\n90\n[88, 73]\n[95, 88]',
+        "列表的索引和切片规则跟字符串完全一样")
+
+    add_section_title(doc, "三、增加元素 —— append / insert")
+    add_knowledge_card(doc,
+        "列表.append(值)    加到末尾\n列表.insert(位置, 值)    插到指定位置",
+        'cart = ["苹果", "香蕉"]\ncart.append("牛奶")       # 加到最后\nprint(cart)               # ["苹果","香蕉","牛奶"]\ncart.insert(1, "草莓")    # 插到1号位\nprint(cart)               # ["苹果","草莓","香蕉","牛奶"]',
+        '["苹果", "香蕉", "牛奶"]\n["苹果", "草莓", "香蕉", "牛奶"]',
+        "append 像排队站最后，insert 像插队到指定位置")
+
+    add_section_title(doc, "四、删除元素 —— remove / pop")
+    add_knowledge_card(doc,
+        "列表.remove(值)    按内容删除\n列表.pop()    弹掉最后一个（返回它）\n列表.pop(索引)    弹掉指定位置",
+        'cart = ["苹果", "香蕉", "牛奶", "面包"]\ncart.remove("香蕉")      # 按内容删\nprint(cart)               # ["苹果","牛奶","面包"]\npopped = cart.pop()       # 弹走最后一个\nprint(f"弹出: {popped}")  # 面包\ncart.pop(0)               # 弹走第0个\nprint(cart)               # ["牛奶"]',
+        '["苹果", "牛奶", "面包"]\n弹出: 面包\n["牛奶"]',
+        "remove 是点名删除，pop 是弹走并拿到手")
+
+    add_tip_card(doc, "避坑", "remove() 删的是第一个匹配的值，如果有重复只删第一个。pop() 返回被删除的值，可以接着用。")
+
+    add_section_title(doc, "五、修改元素 —— 直接赋值")
+    add_knowledge_card(doc,
+        "列表[索引] = 新值",
+        'scores = [95, 88, 73, 90]\nscores[2] = 80           # 把第3个改成80\nprint(scores)              # [95, 88, 80, 90]',
+        '[95, 88, 80, 90]',
+        "通过索引直接赋值就能修改，跟变量赋值一样简单")
+
+    add_section_title(doc, "六、常用操作 —— 排序、查找、遍历")
+    add_knowledge_card(doc,
+        "sort() 排序 | reverse() 反转 | in 判断存在 | for 遍历",
+        'scores = [95, 88, 73, 90, 85]\nscores.sort()            # 从小到大\nprint(scores)              # [73,85,88,90,95]\nscores.sort(reverse=True)  # 从大到小\nprint(90 in scores)        # True\nfor s in scores:\n    print(s)',
+        '[73, 85, 88, 90, 95]\nTrue\n逐行打印每个分数',
+        "sort 排序、in 判断存在、for 遍历是列表三大日常操作")
+
+    add_section_title(doc, "七、实战：待办清单管理器")
+    add_code_block(doc,
+        'todos = ["写作业", "跑步"]                 # 初始清单\nprint(f"待办: {todos}")\n\n'
+        'todos.append("买菜")                       # 新增事项\nprint(f"增加后: {todos}")\n\n'
+        'todos.remove("跑步")                       # 完成"跑步"，删掉\nprint(f"完成后: {todos}")\n\n'
+        'print(f"\n共{len(todos)}件事待办:")\n'
+        'for i, task in enumerate(todos, 1):        # enumerate 同时拿索引和值\n'
+        '    print(f"  {i}. {task}")               # 编号从1开始',
+        "待办清单（append + remove + enumerate）")
+
+    add_tip_card(doc, "笔记", "enumerate(列表, 1) 可以在遍历时同时拿到序号和内容，做待办清单特别好用。")
+
+    add_section_title(doc, "八、列表操作速查表")
+    add_code_block(doc,
+        "创建：    lst = [1, 2, 3]\n"
+        "查个数：  len(lst)              # 3\n"
+        "加最后：  lst.append(4)         # [1, 2, 3, 4]\n"
+        "插中间：  lst.insert(1, \"a\")    # [1, 'a', 2, 3]\n"
+        "按值删：  lst.remove(2)         # [1, 3]\n"
+        "弹最后：  x = lst.pop()         # 取出最后一个\n"
+        "弹位置：  x = lst.pop(0)        # 取出第1个\n"
+        "修改：    lst[0] = \"新值\"\n"
+        "排序：    lst.sort()            # 从小到大\n"
+        "反转：    lst.reverse()\n"
+        "找位置：  lst.index(3)          # 3在第几个位置\n"
+        "出现次数：lst.count(3)\n"
+        "是否存在：3 in lst              # True/False\n"
+        "遍历：    for item in lst:",
+        "列表操作速查表")
+
+    add_section_title(doc, "✏️ 课后练习")
+    answers = parse_practice_answers(6)
+    for num, question, code, hint in answers:
+        add_homework_item(doc, num, question, code, hint)
+
+    add_checklist(doc, [
+        "理解列表是什么：用 [] 装多个数据的容器",
+        "掌握索引 [0]、[-1] 和切片 [1:3]",
+        "掌握 append() 追加和 insert() 插入",
+        "掌握 remove() 按值删除和 pop() 弹出",
+        "会用 sort() 排序和 in 判断存在",
+        "会 for 循环遍历列表",
+        "能独立写待办清单管理器",
+        "完成全部课后练习"
+    ])
+
+    add_watermark(doc)
+    os.makedirs(OUTPUT, exist_ok=True)
+    path = os.path.join(OUTPUT, "第6课_列表.docx")
+    doc.save(path)
+    print(f"OK: {path}")
+    copy_source_files(6)
+
+
 if __name__ == "__main__":
     generate_lesson_2()
     generate_lesson_3()
     generate_lesson_4()
     generate_lesson_5()
+    generate_lesson_6()
     print("\n全部生成完毕！")
 
 
