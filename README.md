@@ -11,22 +11,6 @@
 | 第4课 | 条件判断：if/elif/else、会员折扣、登录验证 | [第4课_条件判断.docx](学习录/第4课_条件判断.docx) | [源代码/第4课](源代码/第4课) |
 | 第5课 | 循环：for/while、break/continue、猜数字游戏 | [第5课_循环.docx](学习录/第5课_循环.docx) | [源代码/第5课](源代码/第5课) |
 | 第6课 | 列表：append/insert/remove/pop/sort、购物车/待办清单 | [第6课_列表.docx](学习录/第6课_列表.docx) | [源代码/第6课](源代码/第6课) |
+| 第7课 | 元组：不可变序列、拆包、RGB/GPS坐标实战 | [第7课_元组.docx](学习录/第7课_元组.docx) | [源代码/第7课](源代码/第7课) |
 
 > 每课文档附带 by Kerlaier 隐秘水印
-
-## 环境准备
-
-- **Python 安装**：https://www.python.org/downloads/
-- **Visual Studio Code 安装**：https://code.visualstudio.com/
-
-## 目录结构
-
-`
-├── 学习录/           # 生成的 .docx 学习文档（带水印）
-├── 源代码/           # 每课的 .py 源文件
-│   ├── 第2课/ 到 第6课/
-├── thinking.py       # 课后作业汇总
-├── generate_doc.py   # 文档自动生成脚本
-├── daily_update.py   # 每日自动更新脚本
-└── README.md
-`

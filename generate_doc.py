@@ -231,6 +231,7 @@ def copy_source_files(lesson_number):
         4: ["lesson_04_if.py", "lesson_04_practice.py"],
         5: ["lesson_05_loop.py", "lesson_05_practice.py"],
         6: ["lesson_06_list.py", "lesson_06_practice.py"],
+        7: ["lesson_07_tuple.py", "lesson_07_practice.py"],
     }
     files = lesson_map.get(lesson_number, [])
     dest_dir = os.path.join(SOURCE_DIR, f"第{lesson_number}课")
@@ -839,12 +840,130 @@ def generate_lesson_6():
     copy_source_files(6)
 
 
+
+# ============================================================
+# 第7课：元组 tuple
+# ============================================================
+def generate_lesson_7():
+    doc = Document()
+    section = doc.sections[0]
+    section.page_width = Cm(21); section.page_height = Cm(29.7)
+
+    add_chapter_banner(doc, 7, "元组 tuple", "2026-07-19")
+
+    add_section_title(doc, "一、什么是元组？——不可修改的列表")
+    add_knowledge_card(doc,
+        "元组 = ()  用圆括号创建，一旦创建就不能增删改",
+        'point = (100, 200)           # 一个坐标点 (x, y)\nperson = ("小明", 20, "男")   # 一个人的信息\nprint(point)        # (100, 200)\n# point[0] = 150    # 报错！元组不能改',
+        "(100, 200)\n('小明', 20, '男')",
+        "元组就是上了锁的列表——创建后不能修改")
+
+    add_section_title(doc, "二、什么时候用列表？什么时候用元组？")
+    add_knowledge_card(doc,
+        "能变的 → 列表 []    不能变的 → 元组 ()",
+        '# 列表：东西会变\nshopping_cart = ["牛奶", "面包"]\nshopping_cart.append("鸡蛋")    # 随时增减\n\n# 元组：东西固定\nrgb_red = (255, 0, 0)           # 红色RGB不会变\nweekdays = ("周一", "周二", "周三", "周四", "周五")',
+        '购物车（列表）: ["牛奶", "面包", "鸡蛋"]\n红色RGB（元组）: (255, 0, 0)',
+        "能变的用 []，不能变的用 ()")
+
+    add_section_title(doc, "三、索引和切片 —— 和列表一模一样")
+    add_knowledge_card(doc,
+        "元组[索引]    索引从0开始，-1是最后一个",
+        'point = (100, 200, 50)        # 三维坐标\nprint(point[0])       # x: 100\nprint(point[-1])      # 最后一维: 50\nrgb = (255, 128, 0)\nprint(rgb[:2])        # 前两个值: (255, 128)',
+        "100\n50\n(255, 128)",
+        "元组的索引和切片跟列表完全一样")
+
+    add_section_title(doc, "四、元组的拆包 —— 一行拆出多个变量")
+    add_knowledge_card(doc,
+        "a, b, c = 元组    一行把多个值分给多个变量",
+        'order = ("红烧肉", 2, 38.0)   # (菜名, 份数, 单价)\nname, count, price = order       # 拆包！\nprint(f"菜名: {name}")            # 红烧肉\nprint(f"总价: {count * price}元")  # 76元',
+        "菜名: 红烧肉\n总价: 76元",
+        "拆包是一行分配多个变量的优雅写法，比 order[0] 更清晰")
+
+    add_tip_card(doc, "笔记", "变量交换 a, b = b, a 本质上也是元组拆包，一行搞定无需临时变量。")
+
+    add_section_title(doc, "五、遍历元组 —— 和列表一样")
+    add_knowledge_card(doc,
+        "for 变量 in 元组:    遍历每个元素",
+        'weekdays = ("周一", "周二", "周三", "周四", "周五")\nfor day in weekdays:\n    print(f"  {day} 要上班")',
+        "周一 要上班 / 周二 要上班 / ...",
+        "for 循环遍历元组跟遍历列表完全一样")
+
+    add_section_title(doc, "六、常用操作 —— len / max / min / sum / in")
+    add_knowledge_card(doc,
+        "len() 个数 | max() 最大 | min() 最小 | sum() 求和 | in 判断存在",
+        'scores = (95, 88, 73, 90, 85)\nprint(len(scores))        # 5\nprint(max(scores))        # 95\nprint(min(scores))        # 73\nprint(sum(scores))        # 431\nprint(88 in scores)       # True',
+        "5 / 95 / 73 / 431 / True",
+        "len/max/min/sum/in 对元组和列表都通用")
+
+    add_section_title(doc, "七、单元素元组 —— 别忘了逗号！")
+    add_knowledge_card(doc,
+        "(5) 是数字 5，不是元组！    (5,) 才是只有一个元素的元组",
+        'not_tuple = (5)          # 这是数字5\nprint(type(not_tuple))   # <class int>\nyes_tuple = (5,)         # 这才是元组\nprint(type(yes_tuple))   # <class tuple>',
+        "<class 'int'>\n<class 'tuple'>",
+        "只有一个元素的元组必须加逗号 (x,)，不然 Python 以为是括号运算")
+
+    add_tip_card(doc, "避坑", "创建单元素元组写成 (5,) 而不是 (5)，少一个逗号类型就变了！")
+
+    add_section_title(doc, "八、实战：学生成绩记录系统")
+    add_code_block(doc,
+        '# 每个学生是一条元组：(姓名, 语文, 数学, 英语)\n'
+        'students = [\n'
+        '    ("小明", 90, 85, 88),\n'
+        '    ("小红", 78, 92, 80),\n'
+        '    ("小刚", 85, 76, 91),\n'
+        ']\n\n'
+        'for name, chinese, math, english in students:\n'
+        '    total = chinese + math + english\n'
+        '    avg = total / 3\n'
+        '    print(f"{name}: 总分{total}, 平均{avg:.1f}")',
+        "学生成绩记录（元组 + 拆包 + 遍历）")
+
+    add_section_title(doc, "九、元组 vs 列表 对比表")
+    add_code_block(doc,
+        "              列表 list              元组 tuple\n"
+        "  ──────────────────────────────────────────\n"
+        "  创建符号      [ ]                    ( )\n"
+        "  能修改？      能                      不能\n"
+        "  append？      能                      不能\n"
+        "  索引用法      [0], [-1], [1:3]       [0], [-1], [1:3]  → 完全一样\n"
+        "  遍历         for x in lst            for x in tup      → 完全一样\n"
+        "  len/max      能                      能                  → 完全一样\n"
+        "  拆包         a, b = lst              a, b = tup         → 完全一样\n"
+        "  什么时候用    内容会变                内容固定不变\n\n"
+        '  一句话：元组就是"上了锁的列表"',
+        "元组 vs 列表完整对比")
+
+    add_section_title(doc, "✏️ 课后练习")
+    answers = parse_practice_answers(7)
+    for num, question, code, hint in answers:
+        add_homework_item(doc, num, question, code, hint)
+
+    add_checklist(doc, [
+        "理解元组是什么：用 () 创建的不可变序列",
+        "区分什么时候用列表（可变）什么时候用元组（固定）",
+        "掌握索引 [0]、[-1] 和切片 [:3]",
+        "掌握拆包：a, b, c = 元组",
+        "会用 len()/max()/min()/sum()/in 操作元组",
+        "记住单元素元组必须加逗号 (x,)",
+        "能独立写元组 + 循环 + 拆包的组合代码",
+        "完成全部课后练习"
+    ])
+
+    add_watermark(doc)
+    os.makedirs(OUTPUT, exist_ok=True)
+    path = os.path.join(OUTPUT, "第7课_元组.docx")
+    doc.save(path)
+    print(f"OK: {path}")
+    copy_source_files(7)
+
+
 if __name__ == "__main__":
     generate_lesson_2()
     generate_lesson_3()
     generate_lesson_4()
     generate_lesson_5()
     generate_lesson_6()
+    generate_lesson_7()
     print("\n全部生成完毕！")
 
 
