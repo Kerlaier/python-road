@@ -1,8 +1,0 @@
-[检测到新内容] 生成文档...
-
-Traceback (most recent call last):
-  File "C:\Users\Wangtanxiao\Desktop\python-road\generate_doc.py", line 4, in <module>
-    from docx import Document
-ModuleNotFoundError: No module named 'docx'
-
-[生成失败] returncode=1
