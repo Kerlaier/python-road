@@ -39,6 +39,9 @@ def main():
     print(result.stdout)
     if result.stderr:
         print(result.stderr)
+    if result.returncode != 0:
+        print(f"[生成失败] returncode={result.returncode}")
+        sys.exit(1)
 
     # generate_doc.py 已直接输出到仓库学习录目录，无需额外复制
 
@@ -50,15 +53,62 @@ def main():
 
     print("[已复制到仓库]")
 
-    # 推送到 GitHub
+    # 推送到 GitHub：代理可选；任何关键 Git 步骤失败都不更新状态。
     repo = os.path.expanduser(r"~\Desktop\python-road")
-    subprocess.run(["git", "-C", repo, "-c", "http.proxy=http://127.0.0.1:7890", "-c", "https.proxy=http://127.0.0.1:7890", "add", "-A"], check=False)
-    subprocess.run(["git", "-C", repo, "-c", "http.proxy=http://127.0.0.1:7890", "-c", "https.proxy=http://127.0.0.1:7890", "commit", "-m", f"自动更新: 学习录 {os.path.basename(SOURCE)}"],
-                   check=False)
-    subprocess.run(["git", "-C", repo, "-c", "http.proxy=http://127.0.0.1:7890", "-c", "https.proxy=http://127.0.0.1:7890", "push", "origin", "main"], check=False)
+    proxy_args = []
+    pet_proxy = os.environ.get("PET_GIT_PROXY", "").strip()
+    if pet_proxy:
+        proxy_args = ["-c", f"http.proxy={pet_proxy}", "-c", f"https.proxy={pet_proxy}"]
+    else:
+        http_proxy = (os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy") or "").strip()
+        https_proxy = (os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy") or "").strip()
+        if http_proxy:
+            proxy_args.extend(["-c", f"http.proxy={http_proxy}"])
+        if https_proxy:
+            proxy_args.extend(["-c", f"https.proxy={https_proxy}"])
+
+    git_prefix = ["git", "-C", repo, *proxy_args]
+
+    def run_git(args, action):
+        completed = subprocess.run(
+            [*git_prefix, *args],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if completed.stdout:
+            print(completed.stdout, end="")
+        if completed.stderr:
+            print(completed.stderr, end="", file=sys.stderr)
+        if completed.returncode != 0:
+            print(f"[{action}失败] returncode={completed.returncode}")
+            sys.exit(1)
+        return completed
+
+    run_git(["add", "-A"], "git add")
+    commit = subprocess.run(
+        [*git_prefix, "commit", "-m", f"自动更新: 学习录 {os.path.basename(SOURCE)}"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if commit.stdout:
+        print(commit.stdout, end="")
+    if commit.stderr:
+        print(commit.stderr, end="", file=sys.stderr)
+    if commit.returncode != 0:
+        commit_output = f"{commit.stdout or ''}\n{commit.stderr or ''}".lower()
+        if "nothing to commit" not in commit_output and "no changes added to commit" not in commit_output:
+            print(f"[git commit失败] returncode={commit.returncode}")
+            sys.exit(1)
+        print("[无新变更] 跳过提交，继续推送已有本地提交")
+
+    run_git(["push", "origin", "main"], "git push")
     print("[已推送到 GitHub]")
 
-    # 记录本次更新时间
+    # 仅在生成、提交和推送均成功后记录更新时间。
     with open(STATE_FILE, "w") as f:
         f.write(str(latest))
     print("[完成]")
